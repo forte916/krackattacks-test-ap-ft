@@ -214,7 +214,11 @@ class KRAckAttackFt():
 	def __init__(self, interface):
 		self.nic_iface = interface
 		self.nic_mon = interface + "mon"
-		self.clientmac = scapy.arch.get_if_hwaddr(interface)
+		try:
+			self.clientmac = scapy.arch.get_if_hwaddr(interface)
+		except Exception as e:
+			print("%s:%s" % (type(e).__name__, str(e)))
+			self.clientmac = "00:90:cc:e6:55:04"
 
 		self.sock  = None
 		self.wpasupp = None
@@ -283,9 +287,10 @@ class KRAckAttackFt():
 		subprocess.check_output(["ifconfig", self.nic_mon, "up"])
 
 	def run(self):
-		self.configure_interfaces()
+		#self.configure_interfaces()
 
-		self.sock = MitmSocket(type=ETH_P_ALL, iface=self.nic_mon)
+		#self.sock = MitmSocket(type=ETH_P_ALL, iface=self.nic_mon)
+		self.sock = MitmSocket(type=ETH_P_ALL, iface=self.nic_iface)
 
 		# Open the wpa_supplicant client that will connect to the network that will be tested
 		self.wpasupp = subprocess.Popen(sys.argv[1:])
